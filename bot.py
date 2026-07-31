@@ -1,13 +1,13 @@
 import asyncio
 import logging
+import json
+import os
 from aiogram import Bot, Dispatcher, F, Router, types
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from aiohttp import web
-import json
-import os
 
-# Имя файла для сохранения
+# Имя файла для хранения данных
 DATA_FILE = "cats.json"
 
 # Загружаем котов из файла при запуске, если он есть, иначе пустой словарь
@@ -17,11 +17,11 @@ if os.path.exists(DATA_FILE):
 else:
     CATS = {}
 
-# Функция для сохранения текущего словаря в файл
 def save_cats():
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(CATS, f, ensure_ascii=False, indent=4)
 
+# Сервер для поддержания активности на Render (keep-alive)
 async def handle(request):
     return web.Response(text="Bot is alive!")
 
@@ -38,7 +38,7 @@ TOKEN = os.getenv("TOKEN")
 
 router = Router()
 
-# Временный хэндлер для получения file_id фото
+# Временный хэндлер для получения file_id фото при отправке картинки в чат
 @router.message(F.photo)
 async def print_file_id(message: types.Message):
     file_id = message.photo[-1].file_id
@@ -47,21 +47,31 @@ async def print_file_id(message: types.Message):
         f"Фото для: {caption}\n ID:\n`{file_id}`", parse_mode="Markdown"
     )
 
-# Подтягиваем реквизиты из защищенных переменных окружения Render
+# Подтягиваем реквизиты из переменные окружения
 PHONE = os.getenv("PHONE")
 CARD = os.getenv("CARD")
 PAYPAL = os.getenv("PAYPAL")
 
 PAYMENT_INFO = (
     "💳 <b>Реквизиты для помощи котикам:</b>\n\n"
-    f"🔴 <b>Kaspi Gold/Halyk Bank:</b>\n<code>{PHONE}</code>\n"
+    f"🔴 <b>Kaspi Gold/Halyk Bank:</b>\n<code>{PHONE}</code> (С.)\n"
     f"🟢 <b>Карта:</b> <code>{CARD}</code>\n"
     f"🌎 <b>PayPal:</b> <code>{PAYPAL}</code>\n"
     "<i>В комментарии перевода укажите имя котика. Спасибо за поддержку!</i>\n"
 )
 
+ABOUT_INFO = (
+    "🐾 <b>О проекте helpcat.kz</b>\n\n"
+    "Мы — волонтерская инициатива в Алматы, которая помогает бездомным котикам "
+    "найти постоянный дом, получить необходимый уход, лечение и передержку. "
+    "Каждый наш подопечный проходит обработку от паразитов и стерилизацию. "
+    "Спасибо каждому, кто помогает нам спасать жизни! ❤️\n\n"
+    "📸 <b>Наш Instagram:</b>\nhttps://www.instagram.com/helpcat.kz"
+)
+
 def get_main_keyboard():
     keyboard = [
+        [InlineKeyboardButton(text="ℹ️ О нас", callback_data="about_info")],
         [InlineKeyboardButton(text="🐾 Наши подопечные", callback_data="catalog")],
         [InlineKeyboardButton(text="💳 Реквизиты", callback_data="pay_info")],
     ]
@@ -70,6 +80,23 @@ def get_main_keyboard():
 @router.message(Command("start"))
 async def cmd_start(message: Message):
     await message.answer("Приветствуем! Выберите нужный раздел:", reply_markup=get_main_keyboard())
+
+@router.callback_query(F.data == "about_info")
+async def show_about(callback: CallbackQuery):
+    keyboard = [[InlineKeyboardButton(text="◀️ Назад", callback_data="main_menu")]]
+    
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+
+    await callback.message.answer(
+        ABOUT_INFO, 
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard), 
+        parse_mode="HTML",
+        disable_web_page_preview=True
+    )
+    await callback.answer()
 
 @router.callback_query(F.data == "catalog")
 async def show_catalog(callback: CallbackQuery):
@@ -85,7 +112,7 @@ async def show_catalog(callback: CallbackQuery):
     except Exception:
         pass
 
-    await callback.message.answer("Все котики ищут постоянные дом. Выберите подопечного:", reply_markup=reply_markup)
+    await callback.message.answer("Выберите подопечного:", reply_markup=reply_markup)
     await callback.answer()
 
 @router.callback_query(F.data.startswith("cat_"))
@@ -100,7 +127,6 @@ async def show_cat_card(callback: CallbackQuery):
         f"<b>{cat['name']}</b>\n\n{cat['desc']}\n\n<b>Нужды:</b>\n{cat['needs']}"
     )
     
-    # Передаем ключ кота в callback_data для кнопки "Помочь"
     keyboard = [
         [InlineKeyboardButton(text="💳 Помочь", callback_data=f"pay_info:{cat_key}")],
         [InlineKeyboardButton(text="◀️ К списку", callback_data="catalog")],
@@ -130,12 +156,11 @@ async def show_cat_card(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("pay_info"))
 async def show_payment(callback: CallbackQuery):
-    # Разбираем callback_data: если есть cat_key (например pay_info:cat_sonya), то вернем к коту
     data_parts = callback.data.split(":")
     if len(data_parts) > 1:
-        back_callback = data_parts[1]  # cat_sonya, cat_marta и т.д.
+        back_callback = data_parts[1]
     else:
-        back_callback = "main_menu"    # Если зашли прямо из главного меню
+        back_callback = "main_menu"
 
     keyboard = [[InlineKeyboardButton(text="◀️ Назад", callback_data=back_callback)]]
     
