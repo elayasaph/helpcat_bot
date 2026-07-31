@@ -49,8 +49,10 @@ router = Router()
 @router.message(F.photo)
 async def print_file_id(message: types.Message):
     file_id = message.photo[-1].file_id
-    await message.answer(f"ID этого фото:\n`{file_id}`", parse_mode="Markdown")
-
+    caption = message.caption or "Без подписи"
+    await message.answer(
+        f"Фото для: <b>{caption}</b>\nID:\n`{file_id}`", parse_mode="Markdown"
+    )
 # База данных котов (теперь изменяемая прямо во время работы бота)
 CATS = {
     "cat_sonya": {
