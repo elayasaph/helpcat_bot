@@ -12,7 +12,7 @@ import os
 # Имя файла для сохранения
 DATA_FILE = "cats.json"
 
-# Загружаем котов из файла при запуске, если он есть
+# Загружаем котов из файла при запуске, если он есть, иначе пустой словарь
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         CATS = json.load(f)
