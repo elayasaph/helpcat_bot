@@ -54,7 +54,7 @@ PAYPAL = os.getenv("PAYPAL")
 
 PAYMENT_INFO = (
     "💳 <b>Реквизиты для помощи котикам:</b>\n\n"
-    f"🔴 <b>Kaspi Gold/Halyk Bank:</b>\n<code>{PHONE}</code> (С.)\n"
+    f"🔴 <b>Kaspi Gold/Halyk Bank:</b>\n<code>{PHONE}</code>\n"
     f"🟢 <b>Карта:</b> <code>{CARD}</code>\n"
     f"🌎 <b>PayPal:</b> <code>{PAYPAL}</code>\n"
     "<i>В комментарии перевода укажите имя котика. Спасибо за поддержку!</i>\n"
