@@ -51,7 +51,7 @@ async def print_file_id(message: types.Message):
     file_id = message.photo[-1].file_id
     caption = message.caption or "Без подписи"
     await message.answer(
-        f"Фото для: <b>{caption}</b>\nID:\n`{file_id}`", parse_mode="Markdown"
+        f"Фото для: {caption}\n ID:\n`{file_id}`", parse_mode="Markdown"
     )
 
 # Загружаем базу котов из файла cats.json
