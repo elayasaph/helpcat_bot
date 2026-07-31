@@ -2,52 +2,49 @@
     "cat_sonya": {
         "name": "🐈 Кошка Соня",
         "desc": "Молодая кошка, 1.5 года. Недавно выкормила котят. Срочно нужна стерилизация, корм, наполнитель, антипаразитарное, ежемесячная оплата передержки.",
-        "needs": "• Стерилизация: 20 000 тг\n• Корм (месяц): 1 кг - 7 000 тг\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n• Антипаразитарное - 4 300 тг.\n"
-	"photo_id": "AgACAgIAAxkBAAMYamzzv4VM2Rok1mkyGae1dh3ZhmUAAq8faxsq-mhL8SL6JJYsUAgBAAMCAAN5AAM9BA"
+        "needs": "• Стерилизация: 20 000 тг\n• Корм (месяц): 1 кг - 7 000 тг\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n• Антипаразитарное - 4 300 тг.\n",
+        "photo_id": "AgACAgIAAxkBAAMYamzzv4VM2Rok1mkyGae1dh3ZhmUAAq8faxsq-mhL8SL6JJYsUAgBAAMCAAN5AAM9BA"
     },
     "cat_marta": {
         "name": "🐈 Кошка Марта",
         "desc": "Спасена с улицы. Требуется фин. куратор для оплаты передержки.",
-        "needs": "• Ежемесячная оплата передержки: 50 000 тг.\n(если вы в Алматы, куратор может навещать Марту)\n"
-	"photo_id": "AgACAgIAAxkBAAMWamzzvzTaAAHglrWzdlYWQfDK612JAAKuH2sbKvpoSxoL5GIhMsCIAQADAgADeQADPQQ"
-
+        "needs": "• Ежемесячная оплата передержки: 50 000 тг.\n(если вы в Алматы, куратор может навещать Марту)\n",
+        "photo_id": "AgACAgIAAxkBAAMWamzzvzTaAAHglrWzdlYWQfDK612JAAKuH2sbKvpoSxoL5GIhMsCIAQADAgADeQADPQQ"
     },
     "cat_alisa": {
         "name": "🐈 Кошка Алиса",
         "desc": "Ласковая кошка. Спасена с улицы. Нужен качественный корм, наполнитель, антипаразитарное",
-        "needs": "• Корм (месяц): 1 кг - 7 000 тг.\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n• Антипаразитарное - 4 300 тг.\n"
-	"photo_id": "AgACAgIAAxkBAAMaamzzv71AvjFX_z9GKCod1ixQoIcAArIfaxsq-mhL6Etm0FyfUG0BAAMCAAN5AAM9BA"
-    	},
+        "needs": "• Корм (месяц): 1 кг - 7 000 тг.\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n• Антипаразитарное - 4 300 тг.\n",
+        "photo_id": "AgACAgIAAxkBAAMaamzzv71AvjFX_z9GKCod1ixQoIcAArIfaxsq-mhL6Etm0FyfUG0BAAMCAAN5AAM9BA"
+    },
     "cat_kroshka": {
         "name": "🐈 Котёнок Крошка",
         "desc": "Активный котёнок белый с табби. 4 месяца. Спасен с улицы, отобрали у детей. Нужен качественный корм, наполнитель, антипаразитарное",
-        "needs": "• Корм (месяц): 1 кг - 7 000 тг.\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n• Антипаразитарное - 4 300 тг.\n"
-	"photo_id": "AgACAgIAAyEFAAMBCj1vdwADCmps-JaeH5KG07XJRLc3t00S1Kc7AAKEIGsbKvpoS9FBiM7I6eqUAQADAgADeQADPQQ"
-    	},
-   "cat_nero": {
+        "needs": "• Корм (месяц): 1 кг - 7 000 тг.\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n• Антипаразитарное - 4 300 тг.\n",
+        "photo_id": "AgACAgIAAyEFAAMBCj1vdwADCmps-JaeH5KG07XJRLc3t00S1Kc7AAKEIGsbKvpoS9FBiM7I6eqUAQADAgADeQADPQQ"
+    },
+    "cat_nero": {
         "name": "🐈 Котёнок Неро",
         "desc": "Активный веселый черный котёнок-мальчик. 2.5 месяца Нужен качественный корм, наполнитель",
-        "needs": "• Корм (месяц): 1 кг - 7 000 тг.\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n"
-	"photo_id": "AgACAgIAAxkBAAMXamzzvxOAZ84ERp2aDlhsbI8B9qMAAlYZaxtpGbhKxR6E5l7PuCYBAAMCAAN5AAM9BA"
-
-    	},
- "cat_mickey": {
+        "needs": "• Корм (месяц): 1 кг - 7 000 тг.\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n",
+        "photo_id": "AgACAgIAAxkBAAMXamzzvxOAZ84ERp2aDlhsbI8B9qMAAlYZaxtpGbhKxR6E5l7PuCYBAAMCAAN5AAM9BA"
+    },
+    "cat_mickey": {
         "name": "🐈 Котёнок Микки",
         "desc": "Серо белый котёнок-мальчик. 2.5 месяца Нужен качественный корм, наполнитель",
-        "needs": "• Корм (месяц): 1 кг - 7 000 тг.\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n"
-	"photo_id": "AgACAgIAAxkBAAMVamzzv0ClCSOLa7qQ2kJGSR1BuE8AAq0faxsq-mhLRrW5XwzEhuUBAAMCAAN5AAM9BA"
-
-    	},
-"cat_kosmos": {
+        "needs": "• Корм (месяц): 1 кг - 7 000 тг.\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n",
+        "photo_id": "AgACAgIAAxkBAAMVamzzv0ClCSOLa7qQ2kJGSR1BuE8AAq0faxsq-mhLRrW5XwzEhuUBAAMCAAN5AAM9BA"
+    },
+    "cat_kosmos": {
         "name": "🐈 Котёнок Космос",
         "desc": "Черный котёнок-мальчик. 2.5 месяца Нужен качественный корм, наполнитель",
-        "needs": "• Корм (месяц): 1 кг - 7 000 тг.\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n"
-	"photo_id": "AgACAgIAAxkBAAMbamzzv5VdneqoAAFaeo11iU93gw93AAK0H2sbKvpoS0BXAarkSYZdAQADAgADeQADPQQ"
-	},
-"cat_harry": {
+        "needs": "• Корм (месяц): 1 кг - 7 000 тг.\n• Наполнитель (месяц): 5 кг - 5 000 тг.\n",
+        "photo_id": "AgACAgIAAxkBAAMbamzzv5VdneqoAAFaeo11iU93gw93AAK0H2sbKvpoS0BXAarkSYZdAQADAgADeQADPQQ"
+    },
+    "cat_harry": {
         "name": "🐈 Кот Гарри",
         "desc": "Белый с табби, 3 года. Спасен с улицы",
-        "needs": "нужен дом в Алматы.\n"
-	"photo_id": "AgACAgIAAxkBAAMZamzzv5JUy7lS-_9tFN_ZICvDb5cAArAfaxsq-mhLML1mkhdTrtYBAAMCAAN5AAM9BA"
-	},
+        "needs": "нужен дом в Алматы.\n",
+        "photo_id": "AgACAgIAAxkBAAMZamzzv5JUy7lS-_9tFN_ZICvDb5cAArAfaxsq-mhLML1mkhdTrtYBAAMCAAN5AAM9BA"
+    }
 }
