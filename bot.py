@@ -54,7 +54,7 @@ PAYPAL = os.getenv("PAYPAL")
 
 PAYMENT_INFO = (
     "💳 <b>Реквизиты для помощи котикам:</b>\n\n"
-    f"🔴 <b>Kaspi Gold/Halyk Bank:</b>\n<code>{PHONE}</code>\n"
+    f"🔴 <b>Kaspi Gold/Halyk Bank:</b>\n<code>{PHONE}</code> (С.)\n"
     f"🟢 <b>Карта:</b> <code>{CARD}</code>\n"
     f"🌎 <b>PayPal:</b> <code>{PAYPAL}</code>\n"
     "<i>В комментарии перевода укажите имя котика. Спасибо за поддержку!</i>\n"
@@ -78,7 +78,15 @@ async def show_catalog(callback: CallbackQuery):
         keyboard.append([InlineKeyboardButton(text=cat_data["name"], callback_data=cat_key)])
     
     keyboard.append([InlineKeyboardButton(text="◀️ Назад", callback_data="main_menu")])
-    await callback.message.edit_text("Выберите подопечного:", reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
+    
+    # Безопасное удаление предыдущего сообщения (будь то фото или текст)
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+
+    await callback.message.answer("Выберите подопечного:", reply_markup=reply_markup)
     await callback.answer()
 
 @router.callback_query(F.data.startswith("cat_"))
@@ -99,7 +107,11 @@ async def show_cat_card(callback: CallbackQuery):
     reply_markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
 
     photo_id = cat.get("photo_id")
-    await callback.message.delete()
+    
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
 
     if photo_id:
         await callback.message.answer_photo(
@@ -118,18 +130,27 @@ async def show_cat_card(callback: CallbackQuery):
 @router.callback_query(F.data == "pay_info")
 async def show_payment(callback: CallbackQuery):
     keyboard = [[InlineKeyboardButton(text="◀️ Назад", callback_data="main_menu")]]
-    await callback.message.edit_text(PAYMENT_INFO, reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard), parse_mode="HTML")
-    await callback.answer()
+    
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
 
-@router.callback_query(F.data == "reports")
-async def show_reports(callback: CallbackQuery):
-    keyboard = [[InlineKeyboardButton(text="◀️ Главное меню", callback_data="main_menu")]]
-    await callback.message.edit_text(REPORTS_INFO, reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard), parse_mode="HTML", disable_web_page_preview=True)
+    await callback.message.answer(
+        PAYMENT_INFO, 
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard), 
+        parse_mode="HTML"
+    )
     await callback.answer()
 
 @router.callback_query(F.data == "main_menu")
 async def back_to_menu(callback: CallbackQuery):
-    await callback.message.edit_text("Главное меню:", reply_markup=get_main_keyboard())
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+
+    await callback.message.answer("Главное меню:", reply_markup=get_main_keyboard())
     await callback.answer()
 
 async def main():
