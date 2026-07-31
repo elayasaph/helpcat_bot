@@ -5,6 +5,19 @@ from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+from aiohttp import web
+
+async def handle(request):
+    return web.Response(text="Bot is alive!")
+
+app = web.Application()
+app.add_routes([web.get("/", handle)])
+
+async def web_server():
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", 10000)
+    await site.start()
 
 # Сюда в кавычки вместо YOUR_BOT_TOKEN_HERE вставьте токен от @BotFather
 TOKEN = "8203060213:AAGeedO-jiERCqVHkp9Q1HxwafACTbZ8uSw"
@@ -169,6 +182,12 @@ async def main():
     dp.include_router(router)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+    async def main():
+    await web_server()  # Запускаем веб-сервер для Render
+    await dp.start_polling(bot)  # Запускаем самого бота
 
 if __name__ == "__main__":
     asyncio.run(main())
