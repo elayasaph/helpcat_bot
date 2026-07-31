@@ -20,7 +20,8 @@ async def web_server():
     await site.start()
 
 # Сюда в кавычки вместо YOUR_BOT_TOKEN_HERE вставьте токен от @BotFather
-TOKEN = "8203060213:AAGeedO-jiERCqVHkp9Q1HxwafACTbZ8uSw"
+import os
+TOKEN = os.getenv("TOKEN")
 
 # Впишите сюда свой числовой ID администратора (можно узнать у @userinfobot)
 ADMIN_ID = 187754740
