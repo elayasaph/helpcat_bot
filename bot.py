@@ -85,7 +85,7 @@ async def show_catalog(callback: CallbackQuery):
     except Exception:
         pass
 
-    await callback.message.answer("Выберите подопечного:", reply_markup=reply_markup)
+    await callback.message.answer("Все котики ищут постоянные дом. Выберите подопечного:", reply_markup=reply_markup)
     await callback.answer()
 
 @router.callback_query(F.data.startswith("cat_"))
