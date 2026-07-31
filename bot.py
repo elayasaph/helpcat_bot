@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from aiogram import Bot, Dispatcher, F, Router
+from aiogram import Bot, Dispatcher, F, Router, types
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from aiogram.fsm.state import State, StatesGroup
@@ -26,6 +26,12 @@ TOKEN = "8203060213:AAGeedO-jiERCqVHkp9Q1HxwafACTbZ8uSw"
 ADMIN_ID = 187754740
 
 router = Router()
+
+# --- СЮДА ВСТАВЛЯЕМ ВРЕМЕННЫЙ ХЕНДЛЕР ---
+@router.message(F.photo)
+async def print_file_id(message: types.Message):
+    file_id = message.photo[-1].file_id
+    await message.answer(f"ID этого фото:\n`{file_id}`", parse_mode="Markdown")
 
 # База данных котов (теперь изменяемая прямо во время работы бота)
 CATS = {
