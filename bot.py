@@ -36,16 +36,12 @@ async def web_server():
     site = web.TCPSite(runner, "0.0.0.0", 10000)
     await site.start()
 
-# Сюда в кавычки вместо YOUR_BOT_TOKEN_HERE вставьте токен от @BotFather
-import os
 TOKEN = os.getenv("TOKEN")
-
-# Впишите сюда свой числовой ID администратора (можно узнать у @userinfobot)
 ADMIN_ID = 187754740
 
 router = Router()
 
-# --- СЮДА ВСТАВЛЯЕМ ВРЕМЕННЫЙ ХЕНДЛЕР ---
+# Временный хэндлер для получения file_id фото
 @router.message(F.photo)
 async def print_file_id(message: types.Message):
     file_id = message.photo[-1].file_id
@@ -54,29 +50,18 @@ async def print_file_id(message: types.Message):
         f"Фото для: {caption}\n ID:\n`{file_id}`", parse_mode="Markdown"
     )
 
-# Загружаем базу котов из файла cats.json
-try:
-    with open("cats.json", "r", encoding="utf-8") as f:
-        CATS = json.load(f)
-except FileNotFoundError:
-    CATS = {}
+# Подтягиваем реквизиты из защищенных переменных окружения Render
+PHONE = os.getenv("PHONE")
+CARD = os.getenv("CARD")
+PAYPAL = os.getenv("EMAIL")
 
 PAYMENT_INFO = (
     "💳 <b>Реквизиты для помощи котикам:</b>\n\n"
-    "🔴 <b>Kaspi Gold/Halyk Bank:\n"
-    "</b><code> +77074040039</code> (Әлия С.)\n"
-    "🟢 <b>Карта:</b><code> 4405 6397 7249 6939</code>\n"
-    "🌎 <b>PayPal:</b> <code>helpcatkz@gmail.com</code>\n"
+    f"🔴 <b>Kaspi Gold/Halyk Bank:</b>\n<code>{PHONE}</code> (С.)\n"
+    f"🟢 <b>Карта:</b> <code>{CARD}</code>\n"
+    "🌎 <b>PayPal:</b> <code>{PAYPAL}</code>\n"
     "<i>В комментарии перевода укажите имя котика. Спасибо за поддержку!</i>\n"
 )
-
-#REPORTS_INFO = (
-    #"📊 <b>Прозрачность и отчетность:</b>\n\n"
-    #"Мы публикуем все подтверждающие документы и чеки\n"
-    #"1. Чеки из ветклиник за стерилизацию и лечение\n"
-    #"2. Фото/видео отчеты о состоянии подопечных\n"
-    #"🔗 Ссылка на наш публичный диск с чеками: <a href='https://disk.yandex.ru'>Открыть папки с чеками</a>"
-#)
 
 # Состояния для пошагового добавления кота через админку
 class AddCatStates(StatesGroup):
@@ -88,9 +73,7 @@ def get_main_keyboard(is_admin=False):
     keyboard = [
         [InlineKeyboardButton(text="🐾 Наши подопечные", callback_data="catalog")],
         [InlineKeyboardButton(text="💳 Реквизиты", callback_data="pay_info")],
-        #[InlineKeyboardButton(text="📊 Отчеты и чеки", callback_data="reports")]
     ]
-    # Если пользователь администратор, добавляем кнопку админ-панели
     if is_admin:
         keyboard.append([InlineKeyboardButton(text="➕ [Админ] Добавить карточку кота", callback_data="admin_add")])
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
@@ -103,7 +86,6 @@ async def cmd_start(message: Message):
 @router.callback_query(F.data == "catalog")
 async def show_catalog(callback: CallbackQuery):
     keyboard = []
-    # Динамически создаем кнопки для всех котов (и базовых, и добавленных через админку)
     for cat_key, cat_data in CATS.items():
         keyboard.append([InlineKeyboardButton(text=cat_data["name"], callback_data=cat_key)])
     
@@ -111,9 +93,14 @@ async def show_catalog(callback: CallbackQuery):
     await callback.message.edit_text("Выберите подопечного:", reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
     await callback.answer()
 
-@router.callback_query(F.data.in_(CATS.keys()))
+@router.callback_query(F.data.startswith("cat_"))
 async def show_cat_card(callback: CallbackQuery):
-    cat = CATS[callback.data]
+    cat_key = callback.data
+    if cat_key not in CATS:
+        await callback.answer("Информация об этом подопечном не найдена.", show_alert=True)
+        return
+
+    cat = CATS[cat_key]
     text = (
         f"<b>{cat['name']}</b>\n\n{cat['desc']}\n\n<b>Нужды:</b>\n{cat['needs']}"
     )
@@ -123,14 +110,10 @@ async def show_cat_card(callback: CallbackQuery):
     ]
     reply_markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
 
-    # Проверяем, есть ли у кота сохраненный file_id фотографии
     photo_id = cat.get("photo_id")
-
-    # Удаляем предыдущее текстовое сообщение, чтобы красиво отправить карточку с фото (или без)
     await callback.message.delete()
 
     if photo_id:
-        # Если фото есть — отправляем фото с текстом-описанием в качестве подписи
         await callback.message.answer_photo(
             photo=photo_id,
             caption=text,
@@ -138,7 +121,6 @@ async def show_cat_card(callback: CallbackQuery):
             parse_mode="HTML",
         )
     else:
-        # Если фото нет — отправляем просто текстовое сообщение
         await callback.message.answer(
             text, reply_markup=reply_markup, parse_mode="HTML"
         )
@@ -163,7 +145,6 @@ async def back_to_menu(callback: CallbackQuery):
     await callback.message.edit_text("Главное меню:", reply_markup=get_main_keyboard(is_admin))
     await callback.answer()
 
-# --- АДМИН-ПАНЕЛЬ: Шаг 1. Нажатие кнопки добавления ---
 @router.callback_query(F.data == "admin_add")
 async def start_add_cat(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != ADMIN_ID:
@@ -174,21 +155,18 @@ async def start_add_cat(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Введите имя кота (например: 🐈 Кот Рыжик):")
     await callback.answer()
 
-# --- Шаг 2. Получаем имя, просим описание ---
 @router.message(AddCatStates.waiting_for_name)
 async def process_cat_name(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
     await state.set_state(AddCatStates.waiting_for_desc)
     await message.answer("Теперь введите описание кота (история, характер):")
 
-# --- Шаг 3. Получаем описание, просим нужды ---
 @router.message(AddCatStates.waiting_for_desc)
 async def process_cat_desc(message: Message, state: FSMContext):
     await state.update_data(desc=message.text)
     await state.set_state(AddCatStates.waiting_for_needs)
     await message.answer("Введите нужды и суммы (например:\n• Корм: 5000 тг\n• Операция: 15000 тг):")
 
-# --- Шаг 4. Сохраняем кота в общую базу ---
 @router.message(AddCatStates.waiting_for_needs)
 async def process_cat_needs(message: Message, state: FSMContext):
     data = await state.get_data()
@@ -196,19 +174,15 @@ async def process_cat_needs(message: Message, state: FSMContext):
     desc = data["desc"]
     needs = message.text
 
-    # Генерируем уникальный внутренний ключ
     cat_key = f"cat_{asyncio.get_event_loop().time()}"
 
-    # Добавляем в словарь CATS
     CATS[cat_key] = {
         "name": name,
         "desc": desc,
         "needs": needs
     }
 
-    # --- СОХРАНЯЕМ В ФАЙЛ ---
     save_cats()
-    # ------------------------
     await state.clear()
     is_admin = (message.from_user.id == ADMIN_ID)
     await message.answer(f"✅ Кот успешно добавлен и сохранен в базу!", reply_markup=get_main_keyboard(is_admin))
@@ -219,7 +193,6 @@ async def main():
     dp = Dispatcher()
     dp.include_router(router)
     
-    # Сначала запускаем веб-сервер для Render, чтобы он занял порт 10000
     await web_server()
     
     await bot.delete_webhook(drop_pending_updates=True)
