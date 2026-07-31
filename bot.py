@@ -128,12 +128,35 @@ async def show_catalog(callback: CallbackQuery):
 @router.callback_query(F.data.in_(CATS.keys()))
 async def show_cat_card(callback: CallbackQuery):
     cat = CATS[callback.data]
-    text = f"<b>{cat['name']}</b>\n\n{cat['desc']}\n\n<b>Нужды:</b>\n{cat['needs']}"
+    text = (
+        f"<b>{cat['name']}</b>\n\n{cat['desc']}\n\n<b>Нужды:</b>\n{cat['needs']}"
+    )
     keyboard = [
         [InlineKeyboardButton(text="💳 Помочь", callback_data="pay_info")],
-        [InlineKeyboardButton(text="◀️ К списку", callback_data="catalog")]
+        [InlineKeyboardButton(text="◀️ К списку", callback_data="catalog")],
     ]
-    await callback.message.edit_text(text, reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard), parse_mode="HTML")
+    reply_markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+    # Проверяем, есть ли у кота сохраненный file_id фотографии
+    photo_id = cat.get("photo_id")
+
+    # Удаляем предыдущее текстовое сообщение, чтобы красиво отправить карточку с фото (или без)
+    await callback.message.delete()
+
+    if photo_id:
+        # Если фото есть — отправляем фото с текстом-описанием в качестве подписи
+        await callback.message.answer_photo(
+            photo=photo_id,
+            caption=text,
+            reply_markup=reply_markup,
+            parse_mode="HTML",
+        )
+    else:
+        # Если фото нет — отправляем просто текстовое сообщение
+        await callback.message.answer(
+            text, reply_markup=reply_markup, parse_mode="HTML"
+        )
+
     await callback.answer()
 
 @router.callback_query(F.data == "pay_info")
