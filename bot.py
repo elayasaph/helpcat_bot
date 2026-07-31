@@ -53,7 +53,7 @@ async def print_file_id(message: types.Message):
 # Подтягиваем реквизиты из защищенных переменных окружения Render
 PHONE = os.getenv("PHONE")
 CARD = os.getenv("CARD")
-PAYPAL = os.getenv("EMAIL")
+PAYPAL = os.getenv("PAYPAL")
 
 PAYMENT_INFO = (
     "💳 <b>Реквизиты для помощи котикам:</b>\n\n"
