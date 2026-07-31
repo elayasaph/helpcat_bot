@@ -1,10 +1,15 @@
 import asyncio
-import logging
 import json
+import logging
 import os
 from aiogram import Bot, Dispatcher, F, Router, types
 from aiogram.filters import Command
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
+from aiogram.types import (
+    CallbackQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
 from aiohttp import web
 
 # Имя файла для хранения данных
@@ -17,22 +22,11 @@ if os.path.exists(DATA_FILE):
 else:
     CATS = {}
 
+
 def save_cats():
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(CATS, f, ensure_ascii=False, indent=4)
 
-# Сервер для поддержания активности на Render (keep-alive)
-async def handle(request):
-    return web.Response(text="Bot is alive!")
-
-app = web.Application()
-app.add_routes([web.get("/", handle)])
-
-async def web_server():
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", 10000)
-    await site.start()
 
 TOKEN = os.getenv("TOKEN")
 
@@ -47,10 +41,11 @@ async def print_file_id(message: types.Message):
         f"Фото для: {caption}\n ID:\n`{file_id}`", parse_mode="Markdown"
     )
 
+
 # Подтягиваем реквизиты из переменных окружения
-PHONE = os.getenv("PHONE")
-CARD = os.getenv("CARD")
-PAYPAL = os.getenv("PAYPAL")
+PHONE = os.getenv("PHONE", "")
+CARD = os.getenv("CARD", "")
+PAYPAL = os.getenv("PAYPAL", "")
 
 # Ссылка на Google Форму для опекунов
 FORM_URL = "https://forms.gle/9TxaoL1Efp4mttBX8"
@@ -72,6 +67,7 @@ ABOUT_INFO = (
     "📸 <b>Наш Instagram:</b>\nhttps://www.instagram.com/helpcat.kz"
 )
 
+
 def get_main_keyboard():
     keyboard = [
         [InlineKeyboardButton(text="ℹ️ О нас", callback_data="about_info")],
@@ -81,65 +77,81 @@ def get_main_keyboard():
     ]
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
+
 @router.message(Command("start"))
 async def cmd_start(message: Message):
-    await message.answer("Приветствуем! Выберите нужный раздел:", reply_markup=get_main_keyboard())
+    await message.answer(
+        "Приветствуем! Выберите нужный раздел:", reply_markup=get_main_keyboard()
+    )
+
 
 @router.callback_query(F.data == "about_info")
 async def show_about(callback: CallbackQuery):
     keyboard = [[InlineKeyboardButton(text="◀️ Назад", callback_data="main_menu")]]
-    
+
     try:
         await callback.message.delete()
     except Exception:
         pass
 
     await callback.message.answer(
-        ABOUT_INFO, 
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard), 
+        ABOUT_INFO,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard),
         parse_mode="HTML",
-        disable_web_page_preview=True
+        disable_web_page_preview=True,
     )
     await callback.answer()
+
 
 @router.callback_query(F.data == "catalog")
 async def show_catalog(callback: CallbackQuery):
     keyboard = []
     for cat_key, cat_data in CATS.items():
-        keyboard.append([InlineKeyboardButton(text=cat_data["name"], callback_data=cat_key)])
-    
-    keyboard.append([InlineKeyboardButton(text="◀️ Назад", callback_data="main_menu")])
+        keyboard.append(
+            [InlineKeyboardButton(text=cat_data["name"], callback_data=cat_key)]
+        )
+
+    keyboard.append(
+        [InlineKeyboardButton(text="◀️ Назад", callback_data="main_menu")]
+    )
     reply_markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
-    
+
     try:
         await callback.message.delete()
     except Exception:
         pass
 
-    await callback.message.answer("Выберите подопечного:", reply_markup=reply_markup)
+    await callback.message.answer(
+        "Выберите подопечного:", reply_markup=reply_markup
+    )
     await callback.answer()
+
 
 @router.callback_query(F.data.startswith("cat_"))
 async def show_cat_card(callback: CallbackQuery):
     cat_key = callback.data
     if cat_key not in CATS:
-        await callback.answer("Информация об этом подопечном не найдена.", show_alert=True)
+        await callback.answer(
+            "Информация об этом подопечном не найдена.", show_alert=True
+        )
         return
 
     cat = CATS[cat_key]
-    text = (
-        f"<b>{cat['name']}</b>\n\n{cat['desc']}\n\n<b>Нужды:</b>\n{cat['needs']}"
-    )
-    
+    text = f"<b>{cat['name']}</b>\n\n{cat['desc']}\n\n<b>Нужды:</b>\n{cat['needs']}"
+
     keyboard = [
-        [InlineKeyboardButton(text="💳 Помочь", callback_data=f"pay_info:{cat_key}")],
+        [
+            InlineKeyboardButton(
+                text="💳 Помочь", callback_data=f"pay_info:{cat_key}"
+            )
+        ],
         [InlineKeyboardButton(text="🏡 Забрать домой", url=FORM_URL)],
         [InlineKeyboardButton(text="◀️ К списку", callback_data="catalog")],
     ]
     reply_markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
 
     photo_id = cat.get("photo_id")
-    
+
     try:
         await callback.message.delete()
     except Exception:
@@ -159,6 +171,7 @@ async def show_cat_card(callback: CallbackQuery):
 
     await callback.answer()
 
+
 @router.callback_query(F.data.startswith("pay_info"))
 async def show_payment(callback: CallbackQuery):
     data_parts = callback.data.split(":")
@@ -167,19 +180,22 @@ async def show_payment(callback: CallbackQuery):
     else:
         back_callback = "main_menu"
 
-    keyboard = [[InlineKeyboardButton(text="◀️ Назад", callback_data=back_callback)]]
-    
+    keyboard = [
+        [InlineKeyboardButton(text="◀️ Назад", callback_data=back_callback)]
+    ]
+
     try:
         await callback.message.delete()
     except Exception:
         pass
 
     await callback.message.answer(
-        PAYMENT_INFO, 
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard), 
-        parse_mode="HTML"
+        PAYMENT_INFO,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard),
+        parse_mode="HTML",
     )
     await callback.answer()
+
 
 @router.callback_query(F.data == "main_menu")
 async def back_to_menu(callback: CallbackQuery):
@@ -188,12 +204,16 @@ async def back_to_menu(callback: CallbackQuery):
     except Exception:
         pass
 
-    await callback.message.answer("Главное меню:", reply_markup=get_main_keyboard())
+    await callback.message.answer(
+        "Главное меню:", reply_markup=get_main_keyboard()
+    )
     await callback.answer()
 
-# --- Фоновый веб-сервер для поддержания работы на Render ---
+
+# --- Фоновый микро-веб-сервер для UptimeRobot ---
 async def handle(request):
     return web.Response(text="Bot is alive!")
+
 
 async def start_web_server():
     app = web.Application()
@@ -201,23 +221,22 @@ async def start_web_server():
     app.router.add_get("/health", handle)
     runner = web.AppRunner(app)
     await runner.setup()
-    # Render автоматически передает переменную PORT, но если ее нет — берем 10000
-    import os
     port = int(os.environ.get("PORT", 10000))
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
-    
-    async def main():
+
+
+# --- Главная функция запуска ---
+async def main():
     logging.basicConfig(level=logging.INFO)
     bot = Bot(token=TOKEN)
     dp = Dispatcher()
     dp.include_router(router)
-    
-    await web_server()
-    
+
     await bot.delete_webhook(drop_pending_updates=True)
     asyncio.create_task(start_web_server())
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
