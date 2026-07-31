@@ -7,10 +7,10 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
 # Сюда в кавычки вместо YOUR_BOT_TOKEN_HERE вставьте токен от @BotFather
-TOKEN = "YOUR_BOT_TOKEN_HERE"
+TOKEN = "8203060213:AAGeedO-jiERCqVHkp9Q1HxwafACTbZ8uSw"
 
 # Впишите сюда свой числовой ID администратора (можно узнать у @userinfobot)
-ADMIN_ID = 123456789
+ADMIN_ID = 187754740
 
 router = Router()
 
