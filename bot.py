@@ -191,7 +191,23 @@ async def back_to_menu(callback: CallbackQuery):
     await callback.message.answer("Главное меню:", reply_markup=get_main_keyboard())
     await callback.answer()
 
-async def main():
+# --- Фоновый веб-сервер для поддержания работы на Render ---
+async def handle(request):
+    return web.Response(text="Bot is alive!")
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get("/", handle)
+    app.router.add_get("/health", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    # Render автоматически передает переменную PORT, но если ее нет — берем 10000
+    import os
+    port = int(os.environ.get("PORT", 10000))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    
+    async def main():
     logging.basicConfig(level=logging.INFO)
     bot = Bot(token=TOKEN)
     dp = Dispatcher()
@@ -200,6 +216,7 @@ async def main():
     await web_server()
     
     await bot.delete_webhook(drop_pending_updates=True)
+    asyncio.create_task(start_web_server())
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
