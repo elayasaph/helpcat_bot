@@ -74,6 +74,7 @@ def get_main_keyboard():
         [InlineKeyboardButton(text="ℹ️ О нас", callback_data="about_info")],
         [InlineKeyboardButton(text="🐾 Наши подопечные", callback_data="catalog")],
         [InlineKeyboardButton(text="💳 Реквизиты", callback_data="pay_info")],
+        [InlineKeyboardButton(text="📝 Анкета для опекуна", url="https://forms.gle/9TxaoL1Efp4mttBX8")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
