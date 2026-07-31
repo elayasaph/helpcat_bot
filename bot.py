@@ -64,7 +64,6 @@ PAYMENT_INFO = (
     "🟢 <b>Карта:</b><code> 4405 6397 7249 6939</code>\n"
     "🌎 </b>PayPal:</b><code> helpcatkz@gmail.com </code>\n"
     "<i> В комментарии перевода укажите имя котика. Спасибо за поддержку!</i>\n"
-   "
 )
 
 #REPORTS_INFO = (
