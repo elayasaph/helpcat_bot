@@ -89,7 +89,7 @@ def get_main_keyboard(is_admin=False):
     ]
     # Если пользователь администратор, добавляем кнопку админ-панели
     if is_admin:
-        keyboard.append([InlineKeyboardButton(text="➕ [Админ] Добавить кота", callback_data="admin_add")])
+        keyboard.append([InlineKeyboardButton(text="➕ [Админ] Добавить карточку кота", callback_data="admin_add")])
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
 @router.message(Command("start"))
