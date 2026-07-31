@@ -53,8 +53,8 @@ CATS = {
 
 PAYMENT_INFO = (
     "💳 <b>Реквизиты для помощи котикам:</b>\n\n"
-    "🟢 <b>Kaspi Gold/Halyk Bank:</b> <code>+7 </code> (.)\n"
-    "🟡 <b>карта:</b> <code>xxxx  </code>\n\n"
+    "🟢 <b>Kaspi Gold/Halyk Bank:</b> <code> +7 (707) 404-00-39</code> (Әлия С.)\n"
+    "🟡 <b>карта:</b> <code>4405 6397 7249 6939</code>\n"
     "<i>Спасибо за поддержку! После перевода проверьте раздел отчетов.</i>"
 )
 
