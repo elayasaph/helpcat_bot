@@ -6,6 +6,23 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, C
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiohttp import web
+import json
+import os
+
+# Имя файла для сохранения
+DATA_FILE = "cats.json"
+
+# Загружаем котов из файла при запуске, если он есть
+if os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        CATS = json.load(f)
+else:
+    CATS = {}
+
+# Функция для сохранения текущего словаря в файл
+def save_cats():
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(CATS, f, ensure_ascii=False, indent=4)
 
 async def handle(request):
     return web.Response(text="Bot is alive!")
@@ -180,9 +197,12 @@ async def process_cat_needs(message: Message, state: FSMContext):
         "needs": needs
     }
 
+    # --- СОХРАНЯЕМ В ФАЙЛ ---
+    save_cats()
+    # ------------------------
     await state.clear()
     is_admin = (message.from_user.id == ADMIN_ID)
-    await message.answer(f"✅ Кот успешно добавлен в каталог и сразу доступен пользователям!", reply_markup=get_main_keyboard(is_admin))
+    await message.answer(f"✅ Кот успешно добавлен и сохранен в базу!", reply_markup=get_main_keyboard(is_admin))
 
 async def main():
     logging.basicConfig(level=logging.INFO)
