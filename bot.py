@@ -3,8 +3,6 @@ import logging
 from aiogram import Bot, Dispatcher, F, Router, types
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.fsm.context import FSMContext
 from aiohttp import web
 import json
 import os
@@ -37,7 +35,6 @@ async def web_server():
     await site.start()
 
 TOKEN = os.getenv("TOKEN")
-ADMIN_ID = 187754740
 
 router = Router()
 
@@ -59,29 +56,20 @@ PAYMENT_INFO = (
     "💳 <b>Реквизиты для помощи котикам:</b>\n\n"
     f"🔴 <b>Kaspi Gold/Halyk Bank:</b>\n<code>{PHONE}</code> (С.)\n"
     f"🟢 <b>Карта:</b> <code>{CARD}</code>\n"
-    "🌎 <b>PayPal:</b> <code>{PAYPAL}</code>\n"
+    f"🌎 <b>PayPal:</b> <code>{PAYPAL}</code>\n"
     "<i>В комментарии перевода укажите имя котика. Спасибо за поддержку!</i>\n"
 )
 
-# Состояния для пошагового добавления кота через админку
-class AddCatStates(StatesGroup):
-    waiting_for_name = State()
-    waiting_for_desc = State()
-    waiting_for_needs = State()
-
-def get_main_keyboard(is_admin=False):
+def get_main_keyboard():
     keyboard = [
         [InlineKeyboardButton(text="🐾 Наши подопечные", callback_data="catalog")],
         [InlineKeyboardButton(text="💳 Реквизиты", callback_data="pay_info")],
     ]
-    if is_admin:
-        keyboard.append([InlineKeyboardButton(text="➕ [Админ] Добавить карточку кота", callback_data="admin_add")])
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
 @router.message(Command("start"))
 async def cmd_start(message: Message):
-    is_admin = (message.from_user.id == ADMIN_ID)
-    await message.answer("Приветствуем! Выберите нужный раздел:", reply_markup=get_main_keyboard(is_admin))
+    await message.answer("Приветствуем! Выберите нужный раздел:", reply_markup=get_main_keyboard())
 
 @router.callback_query(F.data == "catalog")
 async def show_catalog(callback: CallbackQuery):
@@ -141,51 +129,8 @@ async def show_reports(callback: CallbackQuery):
 
 @router.callback_query(F.data == "main_menu")
 async def back_to_menu(callback: CallbackQuery):
-    is_admin = (callback.from_user.id == ADMIN_ID)
-    await callback.message.edit_text("Главное меню:", reply_markup=get_main_keyboard(is_admin))
+    await callback.message.edit_text("Главное меню:", reply_markup=get_main_keyboard())
     await callback.answer()
-
-@router.callback_query(F.data == "admin_add")
-async def start_add_cat(callback: CallbackQuery, state: FSMContext):
-    if callback.from_user.id != ADMIN_ID:
-        await callback.answer("У вас нет прав администратора!", show_alert=True)
-        return
-    
-    await state.set_state(AddCatStates.waiting_for_name)
-    await callback.message.answer("Введите имя кота (например: 🐈 Кот Рыжик):")
-    await callback.answer()
-
-@router.message(AddCatStates.waiting_for_name)
-async def process_cat_name(message: Message, state: FSMContext):
-    await state.update_data(name=message.text)
-    await state.set_state(AddCatStates.waiting_for_desc)
-    await message.answer("Теперь введите описание кота (история, характер):")
-
-@router.message(AddCatStates.waiting_for_desc)
-async def process_cat_desc(message: Message, state: FSMContext):
-    await state.update_data(desc=message.text)
-    await state.set_state(AddCatStates.waiting_for_needs)
-    await message.answer("Введите нужды и суммы (например:\n• Корм: 5000 тг\n• Операция: 15000 тг):")
-
-@router.message(AddCatStates.waiting_for_needs)
-async def process_cat_needs(message: Message, state: FSMContext):
-    data = await state.get_data()
-    name = data["name"]
-    desc = data["desc"]
-    needs = message.text
-
-    cat_key = f"cat_{asyncio.get_event_loop().time()}"
-
-    CATS[cat_key] = {
-        "name": name,
-        "desc": desc,
-        "needs": needs
-    }
-
-    save_cats()
-    await state.clear()
-    is_admin = (message.from_user.id == ADMIN_ID)
-    await message.answer(f"✅ Кот успешно добавлен и сохранен в базу!", reply_markup=get_main_keyboard(is_admin))
 
 async def main():
     logging.basicConfig(level=logging.INFO)
