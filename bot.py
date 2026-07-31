@@ -47,10 +47,13 @@ async def print_file_id(message: types.Message):
         f"Фото для: {caption}\n ID:\n`{file_id}`", parse_mode="Markdown"
     )
 
-# Подтягиваем реквизиты из переменные окружения
+# Подтягиваем реквизиты из переменных окружения
 PHONE = os.getenv("PHONE")
 CARD = os.getenv("CARD")
 PAYPAL = os.getenv("PAYPAL")
+
+# Ссылка на Google Форму для опекунов
+FORM_URL = "https://forms.gle/9TxaoL1Efp4mttBX8"
 
 PAYMENT_INFO = (
     "💳 <b>Реквизиты для помощи котикам:</b>\n\n"
@@ -74,7 +77,7 @@ def get_main_keyboard():
         [InlineKeyboardButton(text="ℹ️ О нас", callback_data="about_info")],
         [InlineKeyboardButton(text="🐾 Наши подопечные", callback_data="catalog")],
         [InlineKeyboardButton(text="💳 Реквизиты", callback_data="pay_info")],
-        [InlineKeyboardButton(text="📝 Анкета для опекуна", url="https://forms.gle/9TxaoL1Efp4mttBX8")],
+        [InlineKeyboardButton(text="📝 Анкета опекуна", url=FORM_URL)],
     ]
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
@@ -113,7 +116,7 @@ async def show_catalog(callback: CallbackQuery):
     except Exception:
         pass
 
-    await callback.message.answer("Все котики находятся в Алматы и ищут постоянный дом. Выберите подопечного:", reply_markup=reply_markup)
+    await callback.message.answer("Выберите подопечного:", reply_markup=reply_markup)
     await callback.answer()
 
 @router.callback_query(F.data.startswith("cat_"))
@@ -130,6 +133,7 @@ async def show_cat_card(callback: CallbackQuery):
     
     keyboard = [
         [InlineKeyboardButton(text="💳 Помочь", callback_data=f"pay_info:{cat_key}")],
+        [InlineKeyboardButton(text="🏡 Забрать домой", url=FORM_URL)],
         [InlineKeyboardButton(text="◀️ К списку", callback_data="catalog")],
     ]
     reply_markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
