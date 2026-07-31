@@ -180,14 +180,12 @@ async def main():
     bot = Bot(token=TOKEN)
     dp = Dispatcher()
     dp.include_router(router)
+    
+    # Сначала запускаем веб-сервер для Render, чтобы он занял порт 10000
+    await web_server()
+    
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    asyncio.run(main())
-    async def main():
-    await web_server()  # Запускаем веб-сервер для Render
-    await dp.start_polling(bot)  # Запускаем самого бота
 
 if __name__ == "__main__":
     asyncio.run(main())
