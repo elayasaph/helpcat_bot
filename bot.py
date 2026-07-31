@@ -59,9 +59,10 @@ CATS = {
 
 PAYMENT_INFO = (
     "💳 <b>Реквизиты для помощи котикам:</b>\n\n"
-    "🟢 <b>Kaspi Gold/Halyk Bank:\n"
+    "🔴 <b>Kaspi Gold/Halyk Bank:\n"
     "</b><code> +77074040039</code> (Әлия С.)\n"
-    "🟡 <b>Карта:</b><code> 4405 6397 7249 6939</code>\n"
+    "🟢 <b>Карта:</b><code> 4405 6397 7249 6939</code>\n"
+    "🌎 </b>PayPal:</b><code> helpcatkz@gmail.com </code>\n""
     "<i> В комментарии перевода укажите имя котика.\n"
     Спасибо за поддержку!</i>"
 )
