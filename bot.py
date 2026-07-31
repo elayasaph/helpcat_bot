@@ -80,7 +80,6 @@ async def show_catalog(callback: CallbackQuery):
     keyboard.append([InlineKeyboardButton(text="◀️ Назад", callback_data="main_menu")])
     reply_markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
     
-    # Безопасное удаление предыдущего сообщения (будь то фото или текст)
     try:
         await callback.message.delete()
     except Exception:
@@ -100,8 +99,10 @@ async def show_cat_card(callback: CallbackQuery):
     text = (
         f"<b>{cat['name']}</b>\n\n{cat['desc']}\n\n<b>Нужды:</b>\n{cat['needs']}"
     )
+    
+    # Передаем ключ кота в callback_data для кнопки "Помочь"
     keyboard = [
-        [InlineKeyboardButton(text="💳 Помочь", callback_data="pay_info")],
+        [InlineKeyboardButton(text="💳 Помочь", callback_data=f"pay_info:{cat_key}")],
         [InlineKeyboardButton(text="◀️ К списку", callback_data="catalog")],
     ]
     reply_markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
@@ -127,9 +128,16 @@ async def show_cat_card(callback: CallbackQuery):
 
     await callback.answer()
 
-@router.callback_query(F.data == "pay_info")
+@router.callback_query(F.data.startswith("pay_info"))
 async def show_payment(callback: CallbackQuery):
-    keyboard = [[InlineKeyboardButton(text="◀️ Назад", callback_data="main_menu")]]
+    # Разбираем callback_data: если есть cat_key (например pay_info:cat_sonya), то вернем к коту
+    data_parts = callback.data.split(":")
+    if len(data_parts) > 1:
+        back_callback = data_parts[1]  # cat_sonya, cat_marta и т.д.
+    else:
+        back_callback = "main_menu"    # Если зашли прямо из главного меню
+
+    keyboard = [[InlineKeyboardButton(text="◀️ Назад", callback_data=back_callback)]]
     
     try:
         await callback.message.delete()
